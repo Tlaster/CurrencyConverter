@@ -45,14 +45,15 @@ public class Parser
         // Skip whitespace after source
         while (i < input.Length && char.IsWhiteSpace(input[i])) i++;
 
-        // First check for explicit "to" keyword
-        var hasExplicitTo = false;
-        if (i + 2 < input.Length &&
-            input.Substring(i, 2).Equals("to", StringComparison.OrdinalIgnoreCase) &&
-            (i + 2 == input.Length || char.IsWhiteSpace(input[i + 2])))
+        if (i + 2 <= input.Length &&
+            ((i + 2 == input.Length && input.Substring(i).Equals("to", StringComparison.OrdinalIgnoreCase)) ||
+             (i + 2 < input.Length && input.Substring(i, 2).Equals("to", StringComparison.OrdinalIgnoreCase) &&
+              char.IsWhiteSpace(input[i + 2]))))
         {
+            // If "to" is the last part of the input, we're done
+            if (i + 2 == input.Length) return new ParseResult(value, source, null);
+
             i += 2; // Skip "to"
-            hasExplicitTo = true;
 
             // Skip whitespace after "to"
             while (i < input.Length && char.IsWhiteSpace(input[i])) i++;

@@ -36,18 +36,12 @@ internal sealed partial class FallbackCurrencyConverterItem : FallbackCommandIte
             .Subscribe(
                 result =>
                 {
-                    if (result == null)
-                    {
-                        Title = string.Empty;
-                        Subtitle = string.Empty;
-                        Command = new NoOpCommand();
-                    }
+                    Title = result.Title;
+                    if (result.Subtitle != null) Subtitle = result.Subtitle;
+                    if (!string.IsNullOrEmpty(result.Title))
+                        Command = new CopyTextCommand(result.Title);
                     else
-                    {
-                        Title = $"{result.RateHumanized} {result.Symbol.ToUpperInvariant()}";
-                        if (result.Date != null) Subtitle = string.Format(Resources.updated_at, result.Date);
-                        Command = new CopyTextCommand(result.RateHumanized);
-                    }
+                        Command = new NoOpCommand();
                 },
                 error =>
                 {
@@ -55,9 +49,7 @@ internal sealed partial class FallbackCurrencyConverterItem : FallbackCommandIte
                     Subtitle = string.Empty;
                     Command = new NoOpCommand();
                 },
-                () =>
-                {
-                },
+                () => { },
                 _cancellationTokenSource.Token);
     }
 
@@ -71,35 +63,37 @@ internal sealed partial class FallbackCurrencyConverterItem : FallbackCommandIte
 
     public override void UpdateQuery(string query)
     {
-        if (string.IsNullOrEmpty(query))
-        {
-            Title = string.Empty;
-            Subtitle = string.Empty;
-            Command = new NoOpCommand();
-        }
-
-        // Simply pass the query to the reactive subject
         _querySubject.OnNext(query);
     }
 
-    private async Task<CurrencyRate?> DoSearchAsync(string query, CancellationToken cancellationToken)
+    private async Task<UiData> DoSearchAsync(string query, CancellationToken cancellationToken)
     {
-        var input = Parser.Parse(query);
-        cancellationToken.ThrowIfCancellationRequested();
+        if (query.Length > 0 && char.IsDigit(query[0]))
+        {
+            var input = Parser.Parse(query);
+            cancellationToken.ThrowIfCancellationRequested();
 
-        if (input == null)
-            return null;
+            if (input == null)
+                return new UiData(query, Resources.app_desc);
 
-        var targets = input.Target == null
-            ? new[] { _settings.DefaultTargetCurrency.Value ?? "USD" }
-            : new[] { input.Target };
+            var targets = input.Target == null
+                ? new[] { _settings.DefaultTargetCurrency.Value ?? "USD" }
+                : new[] { input.Target };
 
-        var result = await _converter.Exchange(Convert.ToDecimal(input.Value), input.Source, targets,
-            cancellationToken);
+            var result = await _converter.Exchange(Convert.ToDecimal(input.Value), input.Source, targets,
+                cancellationToken);
 
-        if (result == null) return null;
+            if (result == null) return new UiData(query, Resources.app_desc);
 
-        cancellationToken.ThrowIfCancellationRequested();
-        return result.Rates.FirstOrDefault();
+            cancellationToken.ThrowIfCancellationRequested();
+            var item = result.Rates.FirstOrDefault();
+            if (item == null) return new UiData(query, Resources.app_desc);
+            return new UiData($"{item.RateHumanized} {item.Symbol.ToUpperInvariant()}",
+                string.Format(Resources.updated_at, item.Date));
+        }
+
+        return new UiData(string.Empty, string.Empty);
     }
 }
+
+internal record UiData(string Title, string? Subtitle);
