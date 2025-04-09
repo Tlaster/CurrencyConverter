@@ -16,17 +16,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="Assets\SplashScreen.scale-200.png"/>
-        <Content Include="Assets\LockScreenLogo.scale-200.png"/>
-        <Content Include="Assets\Square150x150Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png"/>
-        <Content Include="Assets\StoreLogo.png"/>
-        <Content Include="Assets\Wide310x150Logo.scale-200.png"/>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     </ItemGroup>
 
     <ItemGroup>
-        <Manifest Include="$(ApplicationManifest)"/>
+        <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>
 
     <!--
@@ -35,17 +34,17 @@
       package has not yet been restored.
     -->
     <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-        <ProjectCapability Include="Msix"/>
+        <ProjectCapability Include="Msix" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.CommandPalette.Extensions"/>
-        <PackageReference Include="Microsoft.Windows.CsWinRT"/>
-        <PackageReference Include="Microsoft.WindowsAppSDK"/>
-        <PackageReference Include="Microsoft.Web.WebView2"/>
-        <PackageReference Include="System.Reactive"/>
-        <PackageReference Include="System.Text.Json"/>
-        <PackageReference Include="Shmuelie.WinRTServer"/>
-        <PackageReference Include="Microsoft.Windows.CsWinRT"/>
+        <PackageReference Include="Microsoft.CommandPalette.Extensions" />
+        <PackageReference Include="Microsoft.Windows.CsWinRT" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" />
+        <PackageReference Include="Microsoft.Web.WebView2" />
+        <PackageReference Include="System.Reactive" />
+        <PackageReference Include="System.Text.Json" />
+        <PackageReference Include="Shmuelie.WinRTServer" />
+        <PackageReference Include="Microsoft.Windows.CsWinRT" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Update="Properties\Resources.resx">
@@ -79,5 +78,14 @@
 
         <PublishTrimmed>true</PublishTrimmed>
         <PublishSingleFile>true</PublishSingleFile>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppxBundle>Never</AppxBundle>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     </PropertyGroup>
 </Project>
