@@ -16,14 +16,39 @@ public class Parser
         if (string.IsNullOrWhiteSpace(input))
             return null;
 
-        // Step 1: Extract the number part
+        // Step 1: Extract the number part (including commas for thousand separators)
         var i = 0;
-        while (i < input.Length && (char.IsDigit(input[i]) || input[i] == '.')) i++;
+        var hasDigit = false;
+        var hasDecimalPoint = false;
 
-        if (i == 0) // No number part
+        while (i < input.Length)
+        {
+            var c = input[i];
+            if (char.IsDigit(c))
+            {
+                hasDigit = true;
+                i++;
+            }
+            else if (c == '.' && !hasDecimalPoint)
+            {
+                hasDecimalPoint = true;
+                i++;
+            }
+            else if (c == ',' && hasDigit)
+            {
+                // Allow commas as thousand separators
+                i++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (!hasDigit) // No number part
             return null;
 
-        var numberStr = input.Substring(0, i);
+        var numberStr = input[..i].Replace(",", ""); // Remove commas for parsing
         if (!double.TryParse(numberStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
             return null;
 

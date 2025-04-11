@@ -13,6 +13,7 @@ namespace CurrencyConverter;
 
 internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposable
 {
+    private bool _isError = false;
     // For resource management
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -47,6 +48,7 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
             .Subscribe(
                 results =>
                 {
+                    _isError = false;
                     _results = results;
                     IsLoading = false;
                     RaiseItemsChanged(_results.Count);
@@ -54,6 +56,7 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
                 },
                 error =>
                 {
+                    _isError = true;
                     Title = Resources.app_name;
                     // Handle errors
                     IsLoading = false;
@@ -92,12 +95,17 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
         if (input == null) return Array.Empty<ListItem>();
 
         var targets = new List<string>();
-        if (input.Target != null) targets.Add(input.Target);
-
-        targets.AddRange(_popularCurrencies.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
+        if (input.Target != null)
+        {
+            targets.Add(input.Target);
+        }
+        else
+        {
+            targets.AddRange(_popularCurrencies.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
+                                                           && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
+            targets.AddRange(_popularCrypto.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
                                                        && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
-        targets.AddRange(_popularCrypto.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
-                                                   && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
+        }
 
         var result = await _converter.Exchange(Convert.ToDecimal(input.Value), input.Source, targets.ToArray(),
             cancellationToken);
@@ -119,4 +127,12 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
     {
         return _results.ToArray<IListItem>();
     }
+
+    public override ICommandItem? EmptyContent => new CommandItem
+    {
+        Title = _isError ? Resources.convert_error : Resources.convert_empty,
+        Icon = _isError ? new IconInfo("\uea39") : new IconInfo("\ue8af"),
+        Subtitle = _isError ? Resources.convert_error_desc : Resources.convert_empty_desc,
+        Command = new NoOpCommand()
+    };
 }

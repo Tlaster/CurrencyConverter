@@ -64,6 +64,13 @@ internal sealed partial class FallbackCurrencyConverterItem : FallbackCommandIte
     public override void UpdateQuery(string query)
     {
         _querySubject.OnNext(query);
+        if (query.Length > 0 && char.IsDigit(query[0]))
+        {
+            Title = query;
+        } else
+        {
+            Title = string.Empty;
+        }
     }
 
     private async Task<UiData> DoSearchAsync(string query, CancellationToken cancellationToken)

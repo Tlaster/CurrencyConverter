@@ -5,8 +5,8 @@
         xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-        xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+        xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
         IgnorableNamespaces="uap uap3 rescap mp">
 
     <Identity
@@ -41,7 +41,8 @@
                     BackgroundColor="transparent"
                     Square150x150Logo="Assets\Square150x150Logo.png"
                     Square44x44Logo="Assets\Square44x44Logo.png">
-                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png"
+                                 Square310x310Logo="Assets\LargeTile.png"/>
                 <uap:SplashScreen Image="Assets\SplashScreen.png"/>
             </uap:VisualElements>
             <Extensions>
@@ -80,5 +81,6 @@
         <rescap:Capability Name="runFullTrust"/>
     </Capabilities>
 
-    <mp:PhoneIdentity PhoneProductId="ad9e1b90-bedb-4dc1-93f9-248003fa3365" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+    <mp:PhoneIdentity PhoneProductId="ad9e1b90-bedb-4dc1-93f9-248003fa3365"
+                      PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 </Package>
