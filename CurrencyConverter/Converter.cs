@@ -23,7 +23,7 @@ public class Converter : IDisposable
     {
         // fetch exchange rate from https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{source}.min.json
         var response = await _httpClient.GetAsync(
-            $"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{source}.min.json", token);
+            $"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{source.ToLowerInvariant()}.min.json", token);
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync(token);

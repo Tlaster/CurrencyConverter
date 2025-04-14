@@ -6,7 +6,7 @@ namespace CurrencyConverter;
 public class Parser
 {
     /// <summary>
-    ///     Parses a string in the format "number source to target", where "to target" part is optional.
+    ///     Parses a string in the format "number source to target", where "number" and "to target" parts are optional.
     ///     Space between number and source is also optional.
     /// </summary>
     /// <param name="input">The string to parse</param>
@@ -16,10 +16,13 @@ public class Parser
         if (string.IsNullOrWhiteSpace(input))
             return null;
 
-        // Step 1: Extract the number part (including commas for thousand separators)
         var i = 0;
+        double? value = null;
+
+        // Step 1: Extract the number part if present (including commas for thousand separators)
         var hasDigit = false;
         var hasDecimalPoint = false;
+        var numberStart = i;
 
         while (i < input.Length)
         {
@@ -45,12 +48,17 @@ public class Parser
             }
         }
 
-        if (!hasDigit) // No number part
-            return null;
-
-        var numberStr = input[..i].Replace(",", ""); // Remove commas for parsing
-        if (!double.TryParse(numberStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
-            return null;
+        // If we found digits, parse the number
+        if (hasDigit)
+        {
+            var numberStr =
+                input.Substring(numberStart, i - numberStart).Replace(",", ""); // Remove commas for parsing
+            if (double.TryParse(numberStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedValue))
+                value = parsedValue;
+            else
+                // If we can't parse what looks like a number, the input is invalid
+                return null;
+        }
 
         // Step 2: Skip whitespace after the number
         while (i < input.Length && char.IsWhiteSpace(input[i])) i++;
@@ -70,6 +78,7 @@ public class Parser
         // Skip whitespace after source
         while (i < input.Length && char.IsWhiteSpace(input[i])) i++;
 
+        // First check for explicit "to" keyword
         if (i + 2 <= input.Length &&
             ((i + 2 == input.Length && input.Substring(i).Equals("to", StringComparison.OrdinalIgnoreCase)) ||
              (i + 2 < input.Length && input.Substring(i, 2).Equals("to", StringComparison.OrdinalIgnoreCase) &&
@@ -105,14 +114,15 @@ public class Parser
         return new ParseResult(value, source, target);
     }
 
-    // Record with primary constructor
-    public record ParseResult(double Value, string Source, string? Target)
+    // Record with primary constructor, Value is now nullable
+    public record ParseResult(double? Value, string Source, string? Target)
     {
         public override string ToString()
         {
+            var valueStr = Value.HasValue ? Value.ToString() : "null";
             return Target != null
-                ? $"Value: {Value}, Source: '{Source}', Target: '{Target}'"
-                : $"Value: {Value}, Source: '{Source}', Target: null";
+                ? $"Value: {valueStr}, Source: '{Source}', Target: '{Target}'"
+                : $"Value: {valueStr}, Source: '{Source}', Target: null";
         }
     }
 }

@@ -32,10 +32,10 @@ public class SettingsManager : JsonSettingsManager
     public TextSetting DefaultTargetCurrency { get; } = new(
         Namespaced("defaultTargetCurrency"),
         "Default target currency",
-        "The default target currency to use when converting. This is used when no target currency is specified in the command.",
-        "USD"
+        "The default target currency to use when converting. This is used when no target currency is specified in the command. You can have multiple target currencies separated by spaces.",
+        "USD EUR JPY GBP CNY BTC ETH USDT XRP BNB"
     );
-
+    
     private static string Namespaced(string propertyName)
     {
         return $"{Namespace}.{propertyName}";

@@ -80,7 +80,7 @@ internal sealed partial class FallbackCurrencyConverterItem : FallbackCommandIte
             var input = Parser.Parse(query);
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (input == null)
+            if (input?.Value == null)
                 return new UiData(query, Resources.app_desc);
 
             var targets = input.Target == null

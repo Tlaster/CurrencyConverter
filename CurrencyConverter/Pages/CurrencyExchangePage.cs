@@ -19,12 +19,6 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
 
     private readonly Converter _converter = new();
 
-    // top 5 from https://coinmarketcap.com/tokens/
-    private readonly string[] _popularCrypto = ["BTC", "ETH", "USDT", "XRP", "BNB"];
-
-    // top 5 from https://en.wikipedia.org/wiki/Template:Most_traded_currencies
-    private readonly string[] _popularCurrencies = ["USD", "EUR", "JPY", "GBP", "CNY"];
-
     // Subject to publish search text changes
     private readonly Subject<string> _searchTextSubject = new();
     private readonly SettingsManager _settings;
@@ -101,13 +95,14 @@ internal sealed partial class CurrencyConverterPage : DynamicListPage, IDisposab
         }
         else
         {
-            targets.AddRange(_popularCurrencies.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
-                                                           && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
-            targets.AddRange(_popularCrypto.Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
-                                                       && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
+            var defaultTargets = _settings.DefaultTargetCurrency.Value ?? "USD";
+            targets.AddRange(defaultTargets.Split(" ")
+                .Where(x => !x.Equals(input.Source, StringComparison.OrdinalIgnoreCase)
+                && !x.Equals(input.Target, StringComparison.OrdinalIgnoreCase)));
         }
+        var amount = input.Value ?? 1;
 
-        var result = await _converter.Exchange(Convert.ToDecimal(input.Value), input.Source, targets.ToArray(),
+        var result = await _converter.Exchange(Convert.ToDecimal(amount), input.Source, targets.ToArray(),
             cancellationToken);
 
         if (result == null) return Array.Empty<ListItem>();
